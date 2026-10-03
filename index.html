@@ -2,6 +2,37 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <script>
+    /* Выбор варианта экрана (замена index.php для GitHub Pages).
+       1) ?variant=night|dawn|day|sunset — ручная проверка;
+       2) ?map=%m — карта, которую подставляет Garry's Mod;
+       3) иначе — московское время, как в start.bat.
+       Написано на ES5: встроенный браузер GMod старый. */
+    (function () {
+        function param(name) {
+            var m = new RegExp('[?&]' + name + '=([^&#]*)').exec(window.location.search);
+            if (!m) return '';
+            try { return decodeURIComponent(m[1]).toLowerCase(); } catch (e) { return m[1].toLowerCase(); }
+        }
+        var variant = param('variant');
+        var map = param('map');
+        if (!variant && map && map.indexOf('%') === -1) {
+            if (map.indexOf('night') !== -1) variant = 'night';
+            else if (map.indexOf('sunset') !== -1) variant = 'sunset';
+            else if (map.indexOf('storm') !== -1 || map.indexOf('dawn') !== -1) variant = 'dawn';
+            else variant = 'day';
+        }
+        if (!variant) {
+            var h = new Date(new Date().getTime() + 3 * 3600000).getUTCHours();
+            if (h >= 21 || h < 6) variant = 'night';
+            else if (h < 9) variant = 'dawn';
+            else if (h < 18) variant = 'day';
+            else variant = 'sunset';
+        }
+        var pages = { night: 'index_night.html', dawn: 'index_dawn.html', sunset: 'index_sunset.html' };
+        if (pages[variant]) window.location.replace(pages[variant] + window.location.search);
+    })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CINEMA - Аниме Загрузочный экран</title>
     <link rel="stylesheet" href="css/styles.css">
